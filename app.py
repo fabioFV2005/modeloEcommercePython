@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, url_for
 import joblib
-import sklearn
+import numpy as np
 
 app = Flask(__name__)
 
@@ -16,10 +16,11 @@ def predecir():
     cursos = int(request.form['cursos'])
     contacto = int(request.form['contacto'])
 
-    modelo = joblib.load('./modelos/modelo_guardado.pkl')
+    modelo = joblib.load('./modelo.pkl')
     # prediccion=modelo.predict([[1,0,1]])
-    prediccion = modelo.predict([[inicio, cursos, contacto]])
-    if prediccion == 0:
+    entrada = np.array([[inicio, cursos, contacto]])
+    prediccion = modelo.predict(entrada)
+    if prediccion[0] == 0:
         resultado = "No Compra"
         foto = "noComprar.jpg"
     else:
@@ -30,4 +31,6 @@ def predecir():
 
 
 if __name__ == '__main__':
-    app.run()
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
